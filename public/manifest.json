@@ -1,0 +1,23 @@
+{
+  "name": "Celbrico - Festival Commerce",
+  "short_name": "Celbrico",
+  "description": "Celebrate More. Shop Less. India's premium Festival Commerce Platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FCFBF9",
+  "theme_color": "#FF7B00",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
