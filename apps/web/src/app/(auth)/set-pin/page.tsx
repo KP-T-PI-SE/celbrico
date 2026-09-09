@@ -39,9 +39,9 @@ export default function SetPinPage() {
         router.push("/");
       }
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+      const err = error as { response?: { status?: number; data?: { message?: string } } };
       toast.error(err.response?.data?.message || "Failed to set PIN. Session may have expired.");
-      if ((err.response as any)?.status === 401) {
+      if (err.response?.status === 401) {
         router.push("/otp");
       }
     } finally {
