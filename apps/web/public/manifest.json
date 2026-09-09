@@ -1,0 +1,21 @@
+{
+  "name": "Celbrico - Every Festival, Delivered",
+  "short_name": "Celbrico",
+  "description": "Authentic festival essentials, premium groceries, and pooja items delivered to your doorstep.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fdfbf6",
+  "theme_color": "#f97316",
+  "icons": [
+    {
+      "src": "/assets/logo-diya.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/logo-diya.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
