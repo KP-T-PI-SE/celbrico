@@ -2,8 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { CheckCircle2, MapPin, ExternalLink, ArrowRight, ShoppingBag } from "lucide-react";
+import { CheckCircle2, MapPin, ExternalLink } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { api } from "@/lib/api";
 
@@ -36,7 +35,6 @@ interface OrderDetail {
 
 export default function OrderConfirmationPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const router = useRouter();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -177,7 +175,7 @@ export default function OrderConfirmationPage({ params }: { params: Promise<{ id
           <div className="pt-2 border-t border-orange-100/60 space-y-1.5 text-xs">
             <div className="flex justify-between text-foreground/70">
               <span>Delivery Charges</span>
-              <span className="font-medium text-green-600 font-bold">
+              <span className="text-green-600 font-bold">
                 {order.deliveryFee === 0 ? "FREE" : `₹${order.deliveryFee}`}
               </span>
             </div>

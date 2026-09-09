@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ShoppingBag, ChevronRight, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowLeft, ShoppingBag, ChevronRight, Clock } from "lucide-react";
 import BottomNavigation from "@/components/BottomNavigation";
 import { api } from "@/lib/api";
-import { useAuthStore } from "@/store/authStore";
 
 interface OrderItem {
   _id: string;
@@ -25,7 +24,6 @@ interface OrderItem {
 
 export default function OrdersPage() {
   const router = useRouter();
-  const user = useAuthStore((state) => state.user);
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
 

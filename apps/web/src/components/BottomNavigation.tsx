@@ -3,17 +3,13 @@
 import { Home, Grid, ShoppingBag, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { useCartStore } from "@/store/cartStore";
+import { useIsMounted } from "@/lib/useIsMounted";
 
 export default function BottomNavigation() {
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsMounted();
   const totalItems = useCartStore((state) => state.getTotalItems());
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const navItems = [
     { href: "/", label: "Home", icon: Home },

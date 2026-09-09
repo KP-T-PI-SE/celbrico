@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { useIsMounted } from "@/lib/useIsMounted";
 import BottomNavigation from "@/components/BottomNavigation";
 
 export default function CartPage() {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsMounted();
   const {
     items,
     updateQuantity,
@@ -20,10 +20,6 @@ export default function CartPage() {
     getDeliveryFee,
     getTotalAmount,
   } = useCartStore();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (!mounted) {
     return (

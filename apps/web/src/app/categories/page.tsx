@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Plus, Check, Search, Filter } from "lucide-react";
+import { ArrowLeft, Plus, Check, Search } from "lucide-react";
 import toast from "react-hot-toast";
 import BottomNavigation from "@/components/BottomNavigation";
 import { api } from "@/lib/api";

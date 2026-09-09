@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ShoppingBag, ShieldCheck, Sparkles, Check, Plus, Minus, Star, Truck } from "lucide-react";
+import { ArrowLeft, ShoppingBag, ShieldCheck, Sparkles, Plus, Minus, Star, Truck } from "lucide-react";
 import toast from "react-hot-toast";
 import { api } from "@/lib/api";
 import { useCartStore, ProductItem } from "@/store/cartStore";
@@ -77,6 +77,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     router.push("/checkout");
   };
 
+  const categoryName = product.category && typeof product.category === 'object' && 'name' in product.category
+    ? (product.category as { name: string }).name
+    : "Festival Item";
+
   return (
     <main className="min-h-screen bg-background pb-28">
       {/* Top Navigation */}
@@ -147,11 +151,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
         {/* Product Title & Pricing */}
         <div className="bg-white rounded-3xl p-5 border border-orange-100/60 shadow-glass space-y-3">
-          {product.category && (
-            <span className="text-[10px] uppercase font-bold tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-full">
-              {(product.category as any).name || "Festival Item"}
-            </span>
-          )}
+          <span className="text-[10px] uppercase font-bold tracking-wider text-primary bg-primary/10 px-2.5 py-1 rounded-full">
+            {categoryName}
+          </span>
 
           <h1 className="font-serif text-xl font-bold text-foreground leading-snug">
             {product.name}

@@ -1,19 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, MapPin, Navigation, ShieldCheck, CheckCircle2, CreditCard, Banknote, Sparkles, ExternalLink } from "lucide-react";
+import { ArrowLeft, MapPin, Navigation, CheckCircle2, CreditCard, Banknote, ExternalLink } from "lucide-react";
 import toast from "react-hot-toast";
 import { api } from "@/lib/api";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
+import { useIsMounted } from "@/lib/useIsMounted";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getSubtotal, getDeliveryFee, getTotalAmount, clearCart } = useCartStore();
   const user = useAuthStore((state) => state.user);
+  const mounted = useIsMounted();
 
-  const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
 
@@ -30,13 +31,6 @@ export default function CheckoutPage() {
 
   // Payment Method
   const [paymentMethod, setPaymentMethod] = useState<"online" | "cod">("online");
-
-  useEffect(() => {
-    setMounted(true);
-    if (user?.mobileNumber && !mobile) {
-      setMobile(user.mobileNumber);
-    }
-  }, [user, mobile]);
 
   if (!mounted) {
     return (
@@ -163,9 +157,10 @@ export default function CheckoutPage() {
       clearCart();
       toast.success("Order Placed Successfully!");
       router.push(`/orders/${createdOrder.orderNumber}/confirmation`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Order error", error);
-      toast.error(error.response?.data?.message || error.message || "Failed to complete checkout");
+      const err = error as { response?: { data?: { message?: string } }; message?: string };
+      toast.error(err.response?.data?.message || err.message || "Failed to complete checkout");
     } finally {
       setIsSubmitting(false);
     }

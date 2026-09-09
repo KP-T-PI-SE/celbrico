@@ -1,20 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Search, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
+import { useIsMounted } from "@/lib/useIsMounted";
 
 export default function Header() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsMounted();
   const totalItems = useCartStore((state) => state.getTotalItems());
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
