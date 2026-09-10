@@ -27,9 +27,19 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
-    // Handle 401 Unauthorized globally if needed (e.g., redirect to login or refresh token)
+    // Handle 401 Unauthorized globally
     if (error.response?.status === 401) {
       useAuthStore.getState().logout();
+      if (typeof window !== 'undefined') {
+        const currentPath = window.location.pathname;
+        const isAuthPage = currentPath.startsWith('/login') || 
+                           currentPath.startsWith('/otp') || 
+                           currentPath.startsWith('/set-pin') || 
+                           currentPath.startsWith('/onboarding');
+        if (!isAuthPage) {
+          window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+        }
+      }
     }
     return Promise.reject(error);
   }

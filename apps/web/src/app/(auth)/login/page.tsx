@@ -30,7 +30,10 @@ export default function LoginPage() {
       if (res.data.success) {
         login(res.data.user, res.data.token);
         toast.success("Login Successful!");
-        router.push("/");
+        const redirectTo = typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("redirect") || "/"
+          : "/";
+        router.push(redirectTo);
       }
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };

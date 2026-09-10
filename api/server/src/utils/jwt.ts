@@ -5,7 +5,7 @@ const REFRESH_SECRET = process.env.REFRESH_SECRET || 'celbrico_refresh_secret_ke
 
 export const generateToken = (userId: string) => {
   return jwt.sign({ id: userId }, JWT_SECRET, {
-    expiresIn: '15m', // Short-lived access token
+    expiresIn: '30d',
   });
 };
 

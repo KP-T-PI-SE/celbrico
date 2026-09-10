@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, ArrowRight, ShieldCheck } from "lucide-react";
 import toast from "react-hot-toast";
@@ -13,7 +13,14 @@ export default function SetPinPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
+  const tempToken = useAuthStore((state) => state.tempToken);
   const clearTempToken = useAuthStore((state) => state.clearTempToken);
+
+  useEffect(() => {
+    if (!tempToken) {
+      router.replace("/otp");
+    }
+  }, [tempToken, router]);
 
   const handleSetPin = async (e: React.FormEvent) => {
     e.preventDefault();

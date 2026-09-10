@@ -13,6 +13,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, getSubtotal, getDeliveryFee, getTotalAmount, clearCart } = useCartStore();
   const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.token);
   const mounted = useIsMounted();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -95,6 +96,12 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!token) {
+      toast.error("Please sign in to complete your order");
+      router.push(`/login?redirect=${encodeURIComponent("/checkout")}`);
+      return;
+    }
 
     if (!fullName.trim() || !mobile.trim() || !street.trim() || !city.trim() || !pincode.trim()) {
       toast.error("Please fill in all mandatory delivery details");
@@ -373,7 +380,11 @@ export default function CheckoutPage() {
           disabled={isSubmitting}
           className="w-full bg-linear-to-r from-primary to-primary-dark text-white font-semibold rounded-2xl py-4 shadow-glow flex items-center justify-center gap-2 hover:scale-[1.01] transition-transform text-sm disabled:opacity-60"
         >
-          {isSubmitting ? "Confirming Order..." : `Confirm & Place Order (₹${totalAmount})`}
+          {isSubmitting
+            ? "Confirming Order..."
+            : token
+            ? `Confirm & Place Order (₹${totalAmount})`
+            : `Sign In to Place Order (₹${totalAmount})`}
         </button>
       </form>
     </main>

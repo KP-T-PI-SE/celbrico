@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ShoppingBag, ChevronRight, Clock } from "lucide-react";
+import { ArrowLeft, ShoppingBag, ChevronRight, Clock, LogIn } from "lucide-react";
 import BottomNavigation from "@/components/BottomNavigation";
 import { api } from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
+import { useIsMounted } from "@/lib/useIsMounted";
 
 interface OrderItem {
   _id: string;
@@ -24,26 +26,45 @@ interface OrderItem {
 
 export default function OrdersPage() {
   const router = useRouter();
+  const token = useAuthStore((state) => state.token);
+  const mounted = useIsMounted();
   const [orders, setOrders] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!token) return;
+
+    let isSubscribed = true;
+
     const fetchOrders = async () => {
       try {
-        setLoading(true);
         const res = await api.get("/orders/my-orders");
-        if (res.data.success) {
+        if (isSubscribed && res.data.success) {
           setOrders(res.data.data);
         }
       } catch (err) {
         console.error("Failed fetching orders", err);
       } finally {
-        setLoading(false);
+        if (isSubscribed) {
+          setLoading(false);
+        }
       }
     };
 
     fetchOrders();
-  }, []);
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [token]);
+
+  if (!mounted) {
+    return (
+      <main className="min-h-screen bg-background pb-28 flex items-center justify-center">
+        <div className="animate-pulse text-sm text-foreground/50">Loading orders...</div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background pb-28">
@@ -64,7 +85,25 @@ export default function OrdersPage() {
       </div>
 
       <div className="max-w-md mx-auto px-4 mt-4 space-y-4">
-        {loading ? (
+        {!token ? (
+          <div className="py-16 text-center space-y-4">
+            <div className="w-20 h-20 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center text-3xl mx-auto shadow-inner">
+              🔐
+            </div>
+            <div>
+              <h2 className="font-serif text-xl font-bold text-foreground">Sign In to View Orders</h2>
+              <p className="text-xs text-foreground/60 max-w-xs mx-auto mt-1">
+                Please log in with your mobile number to view and track your festival orders.
+              </p>
+            </div>
+            <Link
+              href="/login?redirect=/orders"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-primary to-primary-light text-white font-medium text-xs rounded-full shadow-glow"
+            >
+              <LogIn size={15} /> Sign In Now
+            </Link>
+          </div>
+        ) : loading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-32 bg-white/70 rounded-3xl animate-pulse border border-orange-100/50" />
