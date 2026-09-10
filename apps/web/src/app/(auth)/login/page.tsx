@@ -30,10 +30,17 @@ export default function LoginPage() {
       if (res.data.success) {
         login(res.data.user, res.data.token);
         toast.success("Login Successful!");
-        const redirectTo = typeof window !== "undefined"
-          ? new URLSearchParams(window.location.search).get("redirect") || "/"
-          : "/";
-        router.push(redirectTo);
+        
+        const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+        const redirectParam = urlParams?.get("redirect");
+        
+        if (redirectParam) {
+          router.push(redirectParam);
+        } else if (res.data.user.role === "admin") {
+          router.push("/admin");
+        } else {
+          router.push("/");
+        }
       }
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
@@ -162,6 +169,16 @@ export default function LoginPage() {
                   <Smartphone size={24} />
                </div>
                <span className="text-[10px] font-semibold text-foreground/70 text-center">Login with<br/>OTP</span>
+            </Link>
+          </div>
+
+          <div className="mt-7 pt-4 border-t border-orange-100/60 text-center">
+            <Link
+              href="/admin/login"
+              className="inline-flex items-center gap-1.5 text-xs text-foreground/60 hover:text-primary transition-colors"
+            >
+              <span>Store Administrator or Staff?</span>
+              <span className="font-bold underline text-primary">Admin Sign In &rarr;</span>
             </Link>
           </div>
         </div>

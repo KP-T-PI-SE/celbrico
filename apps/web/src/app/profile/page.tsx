@@ -80,23 +80,56 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        <div className="bg-white rounded-3xl p-6 shadow-glass border border-orange-50 relative z-10 flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl border border-primary/20">
-            {user ? user.mobileNumber.substring(0, 1) : "U"}
+        <div className="bg-white rounded-3xl p-6 shadow-glass border border-orange-50 relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-linear-to-tr from-primary to-gold flex items-center justify-center text-white font-bold text-xl shadow-glow">
+              {user?.name ? user.name.charAt(0).toUpperCase() : user ? user.mobileNumber.charAt(0) : "U"}
+            </div>
+            <div>
+              <h2 className="font-bold text-lg text-foreground">
+                {user?.name || (user ? `+91 ${user.mobileNumber}` : "Guest User")}
+              </h2>
+              {user?.name && (
+                <p className="font-mono text-xs text-foreground/60">+91 {user.mobileNumber}</p>
+              )}
+              <p className="text-xs text-foreground/60 flex items-center gap-1 mt-0.5">
+                <Sparkles size={12} className="text-primary" /> {user?.role === 'admin' ? "Store Administrator" : "Celbrico Member"}
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="font-bold text-lg text-foreground">
-              {user ? `+91 ${user.mobileNumber}` : "Guest User"}
-            </h2>
-            <p className="text-xs text-foreground/60 flex items-center gap-1 mt-1">
-              <Sparkles size={12} className="text-primary" /> Celbrico Member
-            </p>
-          </div>
+
+          {user && (
+            <Link
+              href="/profile/edit"
+              className="text-xs font-bold text-primary px-3 py-1.5 bg-primary/10 rounded-full hover:bg-primary/20 transition-colors"
+            >
+              Edit
+            </Link>
+          )}
         </div>
       </div>
 
       {/* Menu List */}
-      <div className="px-6 space-y-8 mt-2">
+      <div className="px-6 space-y-6 mt-2">
+        {user?.role === 'admin' && (
+          <Link
+            href="/admin"
+            className="block p-4 rounded-3xl bg-linear-to-r from-amber-600 to-primary text-white shadow-glow hover:scale-[1.01] transition-transform"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center font-bold text-lg">
+                  ⚡
+                </div>
+                <div>
+                  <h3 className="font-serif font-bold text-sm">Admin Control Center</h3>
+                  <p className="text-[10px] text-white/80">Manage products, fulfillment, orders & KPIs</p>
+                </div>
+              </div>
+              <ChevronRight size={18} />
+            </div>
+          </Link>
+        )}
         {menuItems.map((group, idx) => (
           <div key={idx}>
             <h3 className="text-xs font-bold text-foreground/50 uppercase tracking-wider mb-3 ml-2">

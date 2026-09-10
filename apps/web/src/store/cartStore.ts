@@ -10,6 +10,7 @@ export interface ProductItem {
   stock: number;
   images: string[];
   description?: string;
+  isActive?: boolean;
   category?: {
     _id: string;
     name: string;
@@ -24,7 +25,7 @@ export interface CartItem {
 
 interface CartState {
   items: CartItem[];
-  addItem: (product: ProductItem, quantity?: number) => void;
+  addItem: (product: ProductItem, quantity?: number) => boolean;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -40,22 +41,35 @@ export const useCartStore = create<CartState>()(
       items: [],
 
       addItem: (product: ProductItem, quantity = 1) => {
+        // Prevent adding out-of-stock or deactivated items
+        if (product.isActive === false || product.stock <= 0) {
+          return false;
+        }
+
         const currentItems = get().items;
         const existingIndex = currentItems.findIndex((i) => i.product._id === product._id);
 
         if (existingIndex > -1) {
+          const currentQty = currentItems[existingIndex].quantity;
+          if (currentQty >= product.stock) {
+            return false;
+          }
+
+          const newQty = Math.min(product.stock, currentQty + quantity);
           const updatedItems = [...currentItems];
-          const newQty = Math.min(
-            product.stock || 99,
-            updatedItems[existingIndex].quantity + quantity
-          );
           updatedItems[existingIndex] = {
             ...updatedItems[existingIndex],
             quantity: newQty,
           };
           set({ items: updatedItems });
+          return true;
         } else {
-          set({ items: [...currentItems, { product, quantity }] });
+          const initialQty = Math.min(product.stock, Math.max(1, quantity));
+          if (initialQty > 0) {
+            set({ items: [...currentItems, { product, quantity: initialQty }] });
+            return true;
+          }
+          return false;
         }
       },
 
@@ -88,9 +102,10 @@ export const useCartStore = create<CartState>()(
 
       getSubtotal: () => {
         return get().items.reduce((acc, item) => {
-          const price = item.product.discountPrice && item.product.discountPrice > 0
-            ? item.product.discountPrice
-            : item.product.price;
+          const price =
+            item.product.discountPrice && item.product.discountPrice > 0
+              ? item.product.discountPrice
+              : item.product.price;
           return acc + price * item.quantity;
         }, 0);
       },

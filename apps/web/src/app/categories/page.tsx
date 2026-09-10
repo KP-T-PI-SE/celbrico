@@ -25,6 +25,7 @@ function CategoriesContent() {
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [searchTerm, setSearchTerm] = useState(initialSearch);
+  const [sortBy, setSortBy] = useState<string>("newest");
   const [loading, setLoading] = useState(true);
   const [addedIds, setAddedIds] = useState<Record<string, boolean>>({});
 
@@ -46,6 +47,9 @@ function CategoriesContent() {
         if (searchTerm) {
           params.search = searchTerm;
         }
+        if (sortBy) {
+          params.sort = sortBy;
+        }
 
         const prodRes = await api.get("/products", { params });
         if (prodRes.data.success) {
@@ -59,7 +63,7 @@ function CategoriesContent() {
     };
 
     fetchCatalog();
-  }, [activeCat, searchTerm]);
+  }, [activeCat, searchTerm, sortBy]);
 
   const handleCategorySelect = (slug: string) => {
     if (slug === "all") {
@@ -72,13 +76,22 @@ function CategoriesContent() {
   const handleAddToCart = (e: React.MouseEvent, product: ProductItem) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product, 1);
-    toast.success(`Added ${product.name} to cart!`);
 
-    setAddedIds((prev) => ({ ...prev, [product._id]: true }));
-    setTimeout(() => {
-      setAddedIds((prev) => ({ ...prev, [product._id]: false }));
-    }, 1500);
+    if (!product.isActive || product.stock <= 0) {
+      toast.error("This item is currently out of stock");
+      return;
+    }
+
+    const added = addItem(product, 1);
+    if (added) {
+      toast.success(`Added ${product.name} to cart!`);
+      setAddedIds((prev) => ({ ...prev, [product._id]: true }));
+      setTimeout(() => {
+        setAddedIds((prev) => ({ ...prev, [product._id]: false }));
+      }, 1500);
+    } else {
+      toast.error(`Cannot add more than available stock (${product.stock})`);
+    }
   };
 
   return (
@@ -138,6 +151,25 @@ function CategoriesContent() {
               {cat.name}
             </button>
           ))}
+        </div>
+
+        {/* Sorting & Product Count Bar */}
+        <div className="flex items-center justify-between pt-2 border-t border-orange-100/50 mt-1">
+          <span className="text-[11px] text-foreground/60 font-medium">
+            {products.length} product{products.length === 1 ? '' : 's'} found
+          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-foreground/50 font-bold uppercase tracking-wider">Sort:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="text-xs font-semibold bg-white border border-orange-100/80 rounded-full px-3 py-1 text-foreground/80 outline-none focus:ring-1 focus:ring-primary shadow-2xs cursor-pointer"
+            >
+              <option value="newest">Featured</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+            </select>
+          </div>
         </div>
       </div>
 

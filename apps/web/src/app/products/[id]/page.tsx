@@ -67,14 +67,30 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     ? product.discountPrice
     : product.price;
 
+  const isOutOfStock = !product.isActive || product.stock <= 0;
+
   const handleAddToCart = () => {
-    addItem(product, quantity);
-    toast.success(`Added ${quantity} × ${product.name} to cart!`);
+    if (isOutOfStock) {
+      toast.error("This item is currently out of stock");
+      return;
+    }
+    const added = addItem(product, quantity);
+    if (added) {
+      toast.success(`Added ${quantity} × ${product.name} to cart!`);
+    } else {
+      toast.error(`Cannot add more than available stock (${product.stock})`);
+    }
   };
 
   const handleBuyNow = () => {
-    addItem(product, quantity);
-    router.push("/checkout");
+    if (isOutOfStock) {
+      toast.error("This item is currently out of stock");
+      return;
+    }
+    const added = addItem(product, quantity);
+    if (added) {
+      router.push("/checkout");
+    }
   };
 
   const categoryName = product.category && typeof product.category === 'object' && 'name' in product.category
@@ -224,15 +240,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         <div className="max-w-md mx-auto flex items-center gap-3">
           <button
             onClick={handleAddToCart}
-            className="flex-1 py-3.5 px-4 bg-orange-50 hover:bg-orange-100/80 border border-orange-200 text-primary font-bold text-xs rounded-2xl transition-colors flex items-center justify-center gap-2"
+            disabled={isOutOfStock}
+            className="flex-1 py-3.5 px-4 bg-orange-50 hover:bg-orange-100/80 border border-orange-200 text-primary font-bold text-xs rounded-2xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <ShoppingBag size={16} /> Add to Cart
+            <ShoppingBag size={16} /> {isOutOfStock ? "Out of Stock" : "Add to Cart"}
           </button>
           <button
             onClick={handleBuyNow}
-            className="flex-1 py-3.5 px-4 bg-linear-to-r from-primary to-primary-dark text-white font-bold text-xs rounded-2xl shadow-glow hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
+            disabled={isOutOfStock}
+            className="flex-1 py-3.5 px-4 bg-linear-to-r from-primary to-primary-dark text-white font-bold text-xs rounded-2xl shadow-glow hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            Buy Now (₹{effectivePrice * quantity})
+            {isOutOfStock ? "Unavailable" : `Buy Now (₹${effectivePrice * quantity})`}
           </button>
         </div>
       </div>
